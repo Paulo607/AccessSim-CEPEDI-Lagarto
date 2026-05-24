@@ -55,7 +55,11 @@ export default function Header() {
             aria-label="AccessSim — início da página"
           >
             <div className="flex items-center gap-2">
-              <img src="/logo-AccessSim.png" alt="Logo AccessSim" width={40} />
+              <img 
+                src="/logo-AccessSim.png" 
+                alt="Logo AccessSim" 
+                className="transition-transform duration-700 hover:rotate-[360deg]"
+                width={40} />
               <div>
                 <span>Access</span>
                 <span className="text-brand-400">Sim</span>

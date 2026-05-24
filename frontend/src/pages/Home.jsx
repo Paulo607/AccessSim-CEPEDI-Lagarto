@@ -462,7 +462,6 @@ export default function Home() {
         <div className="container-app max-w-3xl mx-auto">
           <SectionHeader
             badge="Contato"
-            title="Vamos conversar?"
             title={
               <>
                 Vamos{" "}
