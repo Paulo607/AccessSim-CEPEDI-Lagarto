@@ -2,11 +2,24 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AccessSim | Acessibilidade e Inclusão</title>
+    <meta name="description" content="AccessSim — Simulação e diagnóstico de acessibilidade em espaços urbanos e arquitetônicos. Ajudamos prefeituras, construtoras e arquitetos a construir cidades mais inclusivas." />
+    <meta property="og:title" content="AccessSim — Acessibilidade que transforma espaços" />
+    <meta property="og:description" content="Plataforma de simulação e diagnóstico de acessibilidade para espaços urbanos e arquitetônicos." />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet" />
+    <title>AccessSim — Acessibilidade que transforma espaços</title>
   </head>
-  <body>
+  <body class="bg-navy-950 text-slate-200 antialiased">
+    <!-- Skip link para navegação por teclado -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand-400 focus:text-navy-950 focus:rounded-lg focus:font-display focus:font-bold"
+    >
+      Ir para o conteúdo principal
+    </a>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
