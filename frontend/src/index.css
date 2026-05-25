@@ -13,6 +13,12 @@
   h1, h2, h3, h4 {
     @apply font-display text-white;
   }
+
+  ::selection {
+  background-color: #f97416; /* laranja */
+  color: white; /* cor do texto */
+}
+
 }
 
 @layer components {

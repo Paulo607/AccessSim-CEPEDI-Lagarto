@@ -58,7 +58,7 @@ export default function Header() {
               <img 
                 src="/logo-AccessSim.png" 
                 alt="Logo AccessSim" 
-                className="transition-transform duration-700 hover:rotate-[360deg]"
+                className="transition-transform duration-700 hover:rotate-[360deg] active:rotate-[360deg]"
                 width={40} />
               <div>
                 <span>Access</span>
