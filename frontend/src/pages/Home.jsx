@@ -155,7 +155,7 @@ export default function Home() {
               Acessibilidade arquitetônica com IA + Realidade Aumentada
             </span>
 
-            <h1 className="animate-fade-up-1 font-extrabold text-5xl md:text-6xl leading-[1.1] mb-6">
+            <h1 className="animate-fade-up-1 font-extrabold text-4xl md:text-6xl leading-[1.1] mb-6">
               Diagnóstico de{" "}
               <span className="bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent">
                 acessibilidade
