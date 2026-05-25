@@ -146,7 +146,7 @@ export default function Home() {
         />
         <div
           aria-hidden
-          className="absolute right-[-5vw] top-[18%] w-[45vw] max-w-[540px] aspect-square rounded-full border-[3px] border-brand-400/20 animate-glow"
+          className="absolute right-[-5vw] top-[12%] min-[470px]:top-[14%] sm:top-[17%] w-[45vw] max-w-[540px] aspect-square rounded-full border-[3px] border-brand-400/20 animate-glow"
         />
 
         <div className="container-app relative">
@@ -163,7 +163,7 @@ export default function Home() {
               em horas, não semanas
             </h1>
 
-            <p className="animate-fade-up-2 text-slate-400 text-lg md:text-xl leading-relaxed max-w-xl mb-10">
+            <p className="animate-fade-up-2 text-slate-400 text-md md:text-xl leading-relaxed max-w-xl mb-10">
               A AccessSim usa RA e IA para automatizar a avaliação de acessibilidade
               em projetos arquitetônicos com base na NBR 9050 — em tempo real, direto
               pela câmera do seu dispositivo.
@@ -204,7 +204,8 @@ export default function Home() {
             <div>
               <span className="badge mb-4 inline-block">Nossa missão</span>
               <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-                Transformando a forma como espaços são projetados e aprovados
+                <span>Transformando a forma como espaços são </span>
+                <span className="text-brand-400">projetados e aprovados</span>
               </h2>
               <div className="divider" />
               <p className="text-slate-400 leading-relaxed mb-4">
@@ -247,7 +248,7 @@ export default function Home() {
             badge="Produto"
             title={
               <>
-                A plataforma Access
+                A plataforma Access{""}
                 <span className="text-brand-400">Sim</span>
               </>
             }
@@ -290,7 +291,7 @@ export default function Home() {
             badge="Processo"
             title={
               <>
-                Do diagnóstico ao{" "}
+                <span>Do diagnóstico ao </span>
                 <span className="text-brand-400">plano de ação</span>
               </>
             }
@@ -371,7 +372,7 @@ export default function Home() {
           <div className="bg-gradient-to-br from-navy-800 to-navy-700 border border-white/[0.07] rounded-3xl p-10 md:p-16 text-center">
             <span className="badge mb-6 inline-block">Vagas limitadas</span>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-              Seja um parceiro do{" "}
+              <span>Seja um parceiro do </span>
               <span className="text-brand-400">piloto</span>
             </h2>
             <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
