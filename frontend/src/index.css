@@ -14,6 +14,10 @@
     @apply font-display text-white;
   }
 
+  select option {
+    @apply bg-navy-900 text-white;
+  }
+
   ::selection {
   background-color: #f97416; /* laranja */
   color: white; /* cor do texto */
