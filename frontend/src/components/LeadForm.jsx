@@ -138,7 +138,6 @@ export default function LeadForm({ defaultInterest = "demo" }) {
             <option value="prefeitura">Prefeitura / Órgão público</option>
             <option value="construtora">Construtora / Incorporadora</option>
             <option value="arquitetura">Arquitetura / Engenharia</option>
-            <option value="ong">ONG / Terceiro setor</option>
             <option value="academia">Academia / Pesquisa</option>
             <option value="outro">Outro</option>
           </select>

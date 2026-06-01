@@ -1,3 +1,12 @@
+import {
+  Zap, ClipboardCheck, Accessibility, DollarSign,
+  BarChart2, Handshake, Smartphone, Bot, FileText,
+  Hammer, Building2, Landmark, Building,
+  MapPin, CheckCircle2,
+  GraduationCap, Trees, HardHat,
+  Camera, BrainCircuit, ScanSearch, ScrollText,
+} from "lucide-react";
+
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import SectionHeader        from "../components/SectionHeader";
 import Card                 from "../components/Card";
@@ -8,21 +17,25 @@ import LeadForm             from "../components/LeadForm";
 const HOW_STEPS = [
   {
     num: "01",
+    Icon: Camera,
     title: "Captura do ambiente",
     desc: "Aponte a câmera do smartphone ou tablet para o espaço. A plataforma identifica o ambiente em tempo real via Realidade Aumentada.",
   },
   {
     num: "02",
+    Icon: BrainCircuit,
     title: "Análise por Inteligência Artificial",
     desc: "Nossa IA processa o espaço automaticamente, cruzando cada elemento com os requisitos da NBR 9050.",
   },
   {
     num: "03",
+    Icon: ScanSearch,
     title: "Identificação de não conformidades",
     desc: "Os pontos problemáticos são sobrepostos ao ambiente físico em tempo real, com marcações visuais precisas.",
   },
   {
     num: "04",
+    Icon: ScrollText,
     title: "Relatório e recomendações",
     desc: "A plataforma gera um relatório técnico completo com recomendações automáticas de correção, pronto para uso profissional.",
   },
@@ -30,32 +43,32 @@ const HOW_STEPS = [
 
 const BENEFITS = [
   {
-    icon: "⚡",
+    Icon: Zap,
     title: "Análise em tempo real",
     desc: "Avaliação de acessibilidade instantânea via RA — sem esperar dias por laudos manuais.",
   },
   {
-    icon: "📋",
+    Icon: ClipboardCheck,
     title: "Conformidade NBR 9050",
     desc: "Verificação automatizada de cada requisito da norma, reduzindo erros e omissões humanas.",
   },
   {
-    icon: "♿",
+    Icon: Accessibility,
     title: "Ambientes verdadeiramente inclusivos",
     desc: "Identificamos barreiras que impactam pessoas com deficiência, idosos e mobilidade reduzida.",
   },
   {
-    icon: "💰",
+    Icon: DollarSign,
     title: "Redução de custos",
     desc: "Evite retrabalhos e atrasos onerosos detectando problemas ainda na fase de projeto.",
   },
   {
-    icon: "📊",
+    Icon: BarChart2,
     title: "Relatórios automáticos",
     desc: "Laudos técnicos gerados pela plataforma, prontos para apresentar em aprovações e auditorias.",
   },
   {
-    icon: "🤝",
+    Icon: Handshake,
     title: "Consultoria especializada",
     desc: "Suporte presencial ou remoto de especialistas em acessibilidade arquitetônica em todo o Brasil.",
   },
@@ -63,24 +76,48 @@ const BENEFITS = [
 
 const TARGETS = [
   {
-    emoji: "📐",
+    Icon: Hammer,
     title: "Arquitetos e Engenheiros",
     desc: "Integre a verificação de acessibilidade desde a concepção do projeto, evitando adequações tardias.",
   },
   {
-    emoji: "🏗",
+    Icon: Building2,
     title: "Construtoras",
     desc: "Reduza custos de retrabalho e riscos de embargo validando conformidade antes e durante a obra.",
   },
   {
-    emoji: "🏛",
+    Icon: Landmark,
     title: "Órgãos Públicos",
     desc: "Automatize auditorias de espaços públicos e agilize processos de aprovação e fiscalização.",
   },
   {
-    emoji: "🏙",
+    Icon: Building,
     title: "Smart Cities",
     desc: "Contribua para cidades mais inteligentes, seguras e acessíveis com dados precisos de conformidade urbana.",
+  },
+];
+
+const CASES = [
+  {
+    Icon: GraduationCap,
+    tag: "Educação",
+    title: "IFS Campus Lagarto (dado fictício)",
+    city: "Lagarto / SE",
+    result: "Diagnóstico de acessibilidade do campus com base na NBR 9050",
+  },
+  {
+    Icon: Trees,
+    tag: "Espaço Público",
+    title: "Praça central de Aracaju (dado fictício)",
+    city: "Aracaju / SE",
+    result: "Mapeamento de barreiras e geração de relatório técnico",
+  },
+  {
+    Icon: HardHat,
+    tag: "Construção Civil",
+    title: "Edifício comercial em construção (dado fictício)",
+    city: "Aracaju / SE",
+    result: "Aprovação de projeto com conformidade total à NBR 9050",
   },
 ];
 
@@ -257,24 +294,29 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                icon: "📱",
+                Icon: Smartphone,
                 title: "Realidade Aumentada",
                 desc: "Sobreponha informações técnicas ao ambiente físico via câmera de smartphone ou tablet — sem equipamentos especiais.",
               },
               {
-                icon: "🤖",
+                Icon: Bot,
                 title: "Inteligência Artificial",
                 desc: "Nossa IA identifica pontos de não conformidade em tempo real e gera recomendações automáticas de correção.",
               },
               {
-                icon: "📄",
+                Icon: FileText,
                 title: "Relatórios Técnicos",
                 desc: "Laudos detalhados com base na NBR 9050, prontos para auditorias, aprovações e processos de licenciamento.",
               },
             ].map((f) => (
               <Card key={f.title} className="text-center">
-                <div className="text-4xl mb-4" aria-hidden>
-                  {f.icon}
+                <div className="flex justify-center mb-4">
+                  <f.Icon
+                    size={35}
+                    className="text-brand-400"
+                    aria-hidden="true"
+                    focusable="false"
+                  />
                 </div>
                 <h3 className="text-lg mb-2">{f.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
@@ -329,9 +371,12 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {BENEFITS.map((b) => (
               <Card key={b.title}>
-                <div className="text-3xl mb-3" aria-hidden>
-                  {b.icon}
-                </div>
+                <b.Icon
+                  size={30}
+                  className="text-brand-400 mb-3"
+                  aria-hidden="true"
+                  focusable="false"
+                />
                 <h3 className="text-brand-300 text-lg mb-2">{b.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{b.desc}</p>
               </Card>
@@ -355,9 +400,12 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {TARGETS.map((t) => (
               <Card key={t.title}>
-                <span className="text-4xl mb-4 block" aria-hidden>
-                  {t.emoji}
-                </span>
+                <t.Icon
+                  size={32}
+                  className="text-brand-400 mb-4"
+                  aria-hidden="true"
+                  focusable="false"
+                />
                 <h3 className="text-lg mb-2">{t.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{t.desc}</p>
               </Card>
@@ -401,32 +449,29 @@ export default function Home() {
             subtitle="Projetos reais avaliados com a plataforma AccessSim."
           />
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                tag: "Educação",
-                title: "IFS Campus Lagarto (dado fictício)",
-                city: "Lagarto / SE",
-                result: "Diagnóstico de acessibilidade do campus com base na NBR 9050",
-              },
-              {
-                tag: "Espaço Público",
-                title: "Praça central de Aracaju (dado fictício)",
-                city: "Aracaju / SE",
-                result: "Mapeamento de barreiras e geração de relatório técnico",
-              },
-              {
-                tag: "Construção Civil",
-                title: "Edifício comercial em construção (dado fictício)",
-                city: "Aracaju / SE",
-                result: "Aprovação de projeto com conformidade total à NBR 9050",
-              },
-            ].map((c) => (
+            {CASES.map((c) => (
               <article key={c.title} className="card flex flex-col">
-                <span className="badge mb-4 self-start">{c.tag}</span>
-                <h3 className="text-lg mb-1">{c.title}</h3>
-                <p className="text-xs text-slate-500 mb-4">📍 {c.city}</p>
-                <div className="mt-auto pt-4 border-t border-white/[0.06] text-brand-300 font-display font-semibold text-sm">
-                  ✓ {c.result}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-xl bg-brand-400/10 flex-shrink-0">
+                    <c.Icon
+                      size={20}
+                      className="text-brand-400"
+                      aria-hidden="true"
+                      focusable="false"
+                    />
+                  </div>
+                  <span className="badge">{c.tag}</span>
+                </div>
+                <h3 className="text-lg mb-1">
+                  {c.title}
+                  </h3>
+                <p className="text-md text-slate-500 mb-4 flex items-center gap-1">
+                  <MapPin size={15} aria-hidden="true" focusable="false" />
+                  {c.city}
+                </p>
+                <div className="mt-auto pt-4 border-t border-white/[0.06] text-brand-300 font-display font-semibold text-sm flex items-start gap-1.5">
+                  <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0" aria-hidden="true" focusable="false" />
+                  {c.result}
                 </div>
               </article>
             ))}
