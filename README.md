@@ -19,6 +19,19 @@ A tabela `Lead` armazena os contatos captados pelo portal. Abaixo estão os deta
 
 > **Nota de Relacionamentos:** Neste MVP inicial, a tabela `Lead` é uma entidade isolada e não possui chaves estrangeiras (Foreign Keys) com outras tabelas.
 
+## Modelo em json
+{
+  "nome_completo": "João Silva",
+  "email": "joao@email.com",
+  "organizacao": "",
+  "cargo_funcao": "",
+  "telefone": "",
+  "cidade_estado": "",
+  "segmento": "prefeitura",
+  "como_ajudar": "agendar_demo",
+  "mensagem": "Gostaria de receber mais informações."
+}
+
 
 # AccessSim - Backend
 
@@ -33,3 +46,6 @@ A tabela `Lead` armazena os contatos captados pelo portal. Abaixo estão os deta
 7. Rode o servidor: python manage.py runserver
 8. Acesse http://127.0.0.1:8000/admin/ para o painel administrativo
 9. API de leads: http://127.0.0.1:8000/api/leads/
+
+## exportar CSV
+Acesse http://127.0.0.1:8000/api/leads/export/csv/ logado em um super usuário.
