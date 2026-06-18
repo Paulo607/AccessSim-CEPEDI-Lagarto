@@ -18,3 +18,18 @@ A tabela `Lead` armazena os contatos captados pelo portal. Abaixo estão os deta
 | **mensagem** | `TextField` | Opcional. Maximo 2000 caracteres. |
 
 > **Nota de Relacionamentos:** Neste MVP inicial, a tabela `Lead` é uma entidade isolada e não possui chaves estrangeiras (Foreign Keys) com outras tabelas.
+
+
+# AccessSim - Backend
+
+## Como rodar localmente
+
+1. Clone o repositório
+2. Crie um ambiente virtual: python -m venv venv
+3. Ative o ambiente virtual
+4. Instale as dependências: pip install -r requirements.txt
+5. Rode as migrações: python manage.py migrate
+6. Crie um usuário admin: python manage.py createsuperuser
+7. Rode o servidor: python manage.py runserver
+8. Acesse http://127.0.0.1:8000/admin/ para o painel administrativo
+9. API de leads: http://127.0.0.1:8000/api/leads/
