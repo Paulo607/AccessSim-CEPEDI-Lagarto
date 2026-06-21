@@ -1,35 +1,124 @@
-# AccessSim-CEPEDI-Lagarto
+# AccessSim
 
-## Modelo de Dados (Lead)
+Acessibilidade arquitetônica com IA + Realidade Aumentada — diagnóstico de conformidade com a NBR 9050 sem esperar dias por laudos manuais.
 
-A tabela `Lead` armazena os contatos captados pelo portal. Abaixo estão os detalhes dos campos, tipos e regras de negócio:
+Este repositório contém o site institucional (com formulário de captação de leads) e o painel administrativo usado pela equipe AccessSim para acompanhar os contatos recebidos.
 
-| Campo | Tipo de Dado (Banco) | Regras e Restrições |
+## Stack
+
+| Camada | Tecnologias |
+| :--- | :--- |
+| Backend | Django 6, Django REST Framework, SQLite (dev) |
+| Frontend | React 19, Vite, Tailwind CSS |
+| Auth do painel | Token (DRF `TokenAuthentication`, header `Authorization: Bearer <token>`) |
+
+## Estrutura do projeto
+
+```
+AccessSim-CEPEDI-Lagarto/
+├── backend/DjangoProject/
+│   ├── config/             # settings.py, urls.py raiz
+│   └── leads/               # app principal
+│       ├── models.py        # model Lead
+│       ├── serializers.py   # tradução EN (API) <-> PT (model)
+│       ├── views.py         # endpoints públicos e do painel admin
+│       ├── authentication.py
+│       └── urls.py
+└── frontend/
+    ├── src/components/      # LeadForm, Header, Footer...
+    ├── src/pages/           # Home, Admin
+    └── src/hooks/useApi.js  # camada de acesso à API Django
+```
+
+## Modelo de dados (`Lead`)
+
+| Campo (model) | Tipo | Regras |
 | :--- | :--- | :--- |
-| **nome_completo** | `CharField` | Obrigatório. Máximo de 200 caracteres. |
-| **email** | `EmailField` | Obrigatório. Validação de formato de e-mail. |
-| **organizacao** | `CharField` | Opcional. Máximo de 200 caracteres. |
-| **cargo_funcao** | `CharField` | Opcional. Máximo de 200 caracteres. |
-| **telefone** | `CharField` | Opcional. Máximo de 20 caracteres. |
-| **cidade_estado** | `CharField` | Opcional. Máximo de 100 caracteres. |
-| **segmento** | `CharField` | Opcional. Escolha restrita: ('prefeitura', 'Prefeitura / Órgão Público'),('construtora', 'Construtora / Incorporadora'), ('arquitetura', 'Arquitetura / Engenharia'), ('academia', 'Academia / Pesquisa'),('outro', 'Outro') |
-| **como_ajudar** | `CharField` | Opcional. Padrão (agendar_demo) Escolha restrita: ('agendar_demo', 'Agendar Demo'), ('participar_piloto', 'Participar do Piloto'), ('proposta_parceria', 'Proposta de Parceria'), ('mais_informacoes', 'Mais Informações') |
-| **criado_em** | `DateTimeField` | Automático (Timestamp de criação). Apenas leitura. |
-| **mensagem** | `TextField` | Opcional. Maximo 2000 caracteres. |
+| `nome_completo` | CharField | Obrigatório, até 200 caracteres |
+| `email` | EmailField | Obrigatório, formato validado |
+| `organizacao` | CharField | Opcional, até 200 caracteres |
+| `cargo_funcao` | CharField | Opcional, até 200 caracteres |
+| `telefone` | CharField | Opcional, até 20 caracteres |
+| `cidade_estado` | CharField | Opcional, até 100 caracteres |
+| `segmento` | CharField | Opcional. `prefeitura`, `construtora`, `arquitetura`, `academia`, `outro` |
+| `como_ajudar` | CharField | Padrão `agendar_demo`. `agendar_demo`, `participar_piloto`, `proposta_parceria`, `mais_informacoes` |
+| `mensagem` | TextField | Opcional, até 2000 caracteres |
+| `criado_em` | DateTimeField | Automático, somente leitura |
 
-> **Nota de Relacionamentos:** Neste MVP inicial, a tabela `Lead` é uma entidade isolada e não possui chaves estrangeiras (Foreign Keys) com outras tabelas.
+> Neste MVP, `Lead` é uma entidade isolada, sem chaves estrangeiras com outras tabelas.
 
+### Tradução API ↔ model
 
-# AccessSim - Backend
+O formulário público (`POST /api/leads/`) e o painel admin (`GET /api/leads/list/`) usam nomes de campo em inglês. Internamente, o DRF traduz isso para os campos em português do model:
 
-## Como rodar localmente
+| Campo na API | Campo no model |
+| :--- | :--- |
+| `name` | `nome_completo` |
+| `organization` | `organizacao` |
+| `role` | `cargo_funcao` |
+| `phone` | `telefone` |
+| `city` | `cidade_estado` |
+| `segment` | `segmento` (mesmos valores nos dois lados) |
+| `interest` | `como_ajudar` (**valores diferentes**, ver tabela abaixo) |
+| `message` | `mensagem` |
+| `created_at` | `criado_em` (só leitura, usado no painel) |
 
-1. Clone o repositório
-2. Crie um ambiente virtual: python -m venv venv
-3. Ative o ambiente virtual
-4. Instale as dependências: pip install -r requirements.txt
-5. Rode as migrações: python manage.py migrate
-6. Crie um usuário admin: python manage.py createsuperuser
-7. Rode o servidor: python manage.py runserver
-8. Acesse http://127.0.0.1:8000/admin/ para o painel administrativo
-9. API de leads: http://127.0.0.1:8000/api/leads/
+| `interest` (API) | `como_ajudar` (model) |
+| :--- | :--- |
+| `demo` | `agendar_demo` |
+| `piloto` | `participar_piloto` |
+| `parceria` | `proposta_parceria` |
+| `informacao` | `mais_informacoes` |
+
+## Endpoints da API
+
+| Método | Rota | Autenticação | Descrição |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/leads/` | Pública | Cria um lead a partir do formulário do site |
+| `POST` | `/api/admin/login/` | Pública | Login do painel — devolve `{ token, username }` |
+| `GET` | `/api/leads/list/` | Bearer token | Lista leads — `{ leads: [...], total }`. Aceita `?search=nome ou email` |
+| `GET` | `/api/leads/<id>/` | Bearer token | Detalhe de um lead específico |
+| `GET` | `/api/leads/export/csv/` | Bearer token | Exporta todos os leads em CSV |
+
+Rotas protegidas exigem o cabeçalho `Authorization: Bearer <token>` (token obtido no login).
+
+## Como rodar — Backend
+
+```bash
+cd backend/DjangoProject
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate        # inclui a tabela de tokens (rest_framework.authtoken)
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+- Django admin: http://127.0.0.1:8000/admin/
+- API: http://127.0.0.1:8000/api/
+
+## Como rodar — Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+- Site: http://localhost:5173
+- Painel admin: http://localhost:5173/admin (login com o superusuário criado acima)
+
+> Backend e frontend precisam estar rodando ao mesmo tempo (dois terminais) — o Vite só consegue atender `/api/...` porque está fazendo proxy para o Django.
+
+## Variáveis de ambiente (frontend)
+
+| Arquivo | Usado em | Valor |
+| :--- | :--- | :--- |
+| `.env` | `npm run dev` | `VITE_API_URL=` vazio — usa o proxy do Vite |
+| `.env.production` | `npm run build` | `VITE_API_URL=https://...` — URL pública do backend, sem proxy |
+
+## Notas para produção
+
+- `CORS_ALLOW_ALL_ORIGINS = True` em `settings.py` é só para desenvolvimento. Em produção, troque por `CORS_ALLOWED_ORIGINS = ["https://seu-dominio.com"]`.
+- Defina `DEBUG = False` e mova `SECRET_KEY` para uma variável de ambiente antes de implantar.
+- `VITE_API_URL` em `.env.production` precisa apontar para o domínio real do backend já implantado (com `https://`, sem barra no final).
