@@ -26,8 +26,10 @@ class Lead(models.Model):
     cidade_estado = models.CharField(max_length=100, blank=True)
     segmento = models.CharField(max_length=20, choices=SEGMENTO_CHOICES, blank=True)
     como_ajudar = models.CharField(max_length=20, choices=AJUDA_CHOICES, default='agendar_demo')
-    mensagem = models.TextField(max_length=2000, blank=True, null=True)
-    criado_em = models.DateTimeField(auto_now_add=True)
+    mensagem       = models.TextField(max_length=2000, blank=True, null=True)
+    consentimento  = models.BooleanField(default=False)
+    origem         = models.CharField(max_length=100, blank=True, default='site')
+    criado_em      = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):

@@ -47,11 +47,28 @@ class LeadCreateSerializer(serializers.ModelSerializer):
     interest = InterestField(source='como_ajudar')
     message = serializers.CharField(
         source='mensagem', required=False, allow_blank=True, allow_null=True)
+    consent = serializers.BooleanField(source='consentimento')
+    source = serializers.CharField(source='origem', required=False, allow_blank=True, default='site')
 
     class Meta:
         model = Lead
         fields = ['id', 'name', 'email', 'organization', 'role', 'phone',
-                   'city', 'segment', 'interest', 'message']
+                   'city', 'segment', 'interest', 'message', 'consent', 'source']
+    
+    def validate_consent(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "É necessário aceitar a política de privacidade para continuar."
+            )
+        return value
+
+    def validate_name(self, value):
+        if len(value.strip()) < 2:
+            raise serializers.ValidationError("Informe seu nome completo.")
+        return value.strip()
+
+    def validate_email(self, value):
+        return value.lower().strip()
 
 
 class LeadAdminSerializer(serializers.ModelSerializer):
@@ -63,9 +80,11 @@ class LeadAdminSerializer(serializers.ModelSerializer):
     segment = serializers.CharField(source='segmento')
     interest = InterestField(source='como_ajudar')
     message = serializers.CharField(source='mensagem')
+    consent = serializers.BooleanField(source='consentimento')
+    source = serializers.CharField(source='origem')
     created_at = serializers.DateTimeField(source='criado_em')
 
     class Meta:
         model = Lead
         fields = ['id', 'name', 'email', 'organization', 'role', 'phone',
-                   'city', 'segment', 'interest', 'message', 'created_at']
+                   'city', 'segment', 'interest', 'message', 'consent', 'source', 'created_at']
