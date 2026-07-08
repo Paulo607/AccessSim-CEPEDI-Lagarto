@@ -3,6 +3,8 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import authenticate
 from django.db.models import Q
 from .authentication import BearerTokenAuthentication
@@ -10,6 +12,12 @@ from .models import Lead
 from .serializers import LeadCreateSerializer, LeadAdminSerializer
 import csv
 from django.http import HttpResponse
+from django.utils.timezone import localtime
+
+class LeadPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 try:
     import openpyxl
@@ -94,7 +102,7 @@ class LeadExportXlsxView(APIView):
                 sanitize_cell(lead.mensagem or ''),
                 'Sim' if lead.consentimento else 'Não',
                 sanitize_cell(lead.origem),
-                lead.criado_em.strftime('%d/%m/%Y %H:%M'),
+                localtime(lead.criado_em).strftime('%d/%m/%Y %H:%M'),
             ]
             for col_idx, value in enumerate(row, 1):
                 ws.cell(row=row_idx, column=col_idx, value=value)
@@ -114,6 +122,7 @@ class LeadExportXlsxView(APIView):
 class LeadCreateView(generics.CreateAPIView):
     queryset = Lead.objects.all()
     serializer_class = LeadCreateSerializer
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -138,14 +147,40 @@ class LeadListView(generics.ListAPIView):
         BasicAuthentication,
     ]
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = LeadPagination
 
     def list(self, request, *args, **kwargs):
         queryset = _apply_filters(self.get_queryset(), request)
+
+        stats = {
+            'demo': queryset.filter(como_ajudar='agendar_demo').count(),
+            'piloto': queryset.filter(como_ajudar='participar_piloto').count(),
+            'parceria': queryset.filter(como_ajudar='proposta_parceria').count(),
+            'informacao': queryset.filter(como_ajudar='mais_informacoes').count(),
+        }
+        
+        segments = {}
+        for s in queryset.values_list('segmento', flat=True):
+            if s:
+                segments[s] = segments.get(s, 0) + 1
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return Response({
+                'total': self.paginator.page.paginator.count,
+                'leads': serializer.data,
+                'stats': stats,
+                'segments': segments
+            })
+
         serializer = self.get_serializer(queryset, many=True)
 
         return Response({
             'leads': serializer.data,
             'total': queryset.count(),
+            'stats': stats,
+            'segments': segments
         })
 
 
@@ -157,6 +192,7 @@ class LeadDetailView(generics.RetrieveAPIView):
 
 class AdminLoginView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
         username = request.data.get('username', '').strip()
@@ -219,7 +255,7 @@ class LeadExportCsvView(APIView):
                 sanitize_cell(lead.mensagem),
                 'Sim' if lead.consentimento else 'Não',
                 sanitize_cell(lead.origem),
-                lead.criado_em.strftime('%d/%m/%Y %H:%M'),
+                localtime(lead.criado_em).strftime('%d/%m/%Y %H:%M'),
             ])
 
         return response

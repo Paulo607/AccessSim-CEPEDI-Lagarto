@@ -33,41 +33,24 @@ export function fetchLeads(token, params = {}) {
   });
 }
 
-// ALTERADO: recebe params e os repassa como query string
-// Antes: ignorava filtros; agora o CSV baixado respeita segmento/interesse/cidade/busca
-export async function downloadCsv(token, params = {}) {
+// ALTERADO: Lógica unificada para evitar duplicação de código
+async function _downloadFile(type, ext, token, params = {}) {
   const clean = Object.fromEntries(
     Object.entries(params).filter(([, v]) => v !== "" && v != null)
   );
   const qs  = new URLSearchParams(clean).toString();
-  const res = await fetch(`${BASE}/api/leads/export/csv/${qs ? "?" + qs : ""}`, {
+  const res = await fetch(`${BASE}/api/leads/export/${type}/${qs ? "?" + qs : ""}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Falha ao exportar CSV");
+  if (!res.ok) throw new Error(`Falha ao exportar ${ext.toUpperCase()}`);
   const blob = await res.blob();
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");
   a.href     = url;
-  a.download = `leads_accesssim_${Date.now()}.csv`;
+  a.download = `leads_accesssim_${Date.now()}.${ext}`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// ALTERADO: idem ao CSV
-export async function downloadXlsx(token, params = {}) {
-  const clean = Object.fromEntries(
-    Object.entries(params).filter(([, v]) => v !== "" && v != null)
-  );
-  const qs  = new URLSearchParams(clean).toString();
-  const res = await fetch(`${BASE}/api/leads/export/xlsx/${qs ? "?" + qs : ""}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Falha ao exportar XLSX");
-  const blob = await res.blob();
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
-  a.href     = url;
-  a.download = `leads_accesssim_${Date.now()}.xlsx`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+export function downloadCsv(token, params = {}) { return _downloadFile('csv', 'csv', token, params); }
+export function downloadXlsx(token, params = {}) { return _downloadFile('xlsx', 'xlsx', token, params); }

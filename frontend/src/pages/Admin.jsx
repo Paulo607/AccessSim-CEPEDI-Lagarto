@@ -210,11 +210,9 @@ function AdminDashboard({ token, username, onLogout }) {
       const data = await fetchLeads(token, params);
       setLeads(data.leads);
       setTotal(data.total);
-      const counts = { demo: 0, piloto: 0, parceria: 0, informacao: 0 };
-      data.leads.forEach((l) => { if (l.interest in counts) counts[l.interest]++; });
-      setStats(counts);
-      const segMap = {};
-      data.leads.forEach((l) => { if (l.segment) segMap[l.segment] = (segMap[l.segment] || 0) + 1; });
+      
+      setStats(data.stats || {});
+      const segMap = data.segments || {};
       setSegmentStats(Object.entries(segMap).map(([k, v]) => ({ name: SEG_LABELS[k] || k, value: v })));
     } catch (err) {
       setError(err?.erro || "Falha ao carregar leads.");
@@ -242,7 +240,7 @@ function AdminDashboard({ token, username, onLogout }) {
   function handleSearch(e) {
     e.preventDefault();
     setPage(1);
-    load(buildParams());
+    load({ ...buildParams(), page: 1 });
   }
 
   function handleClearAll() {
@@ -252,17 +250,17 @@ function AdminDashboard({ token, username, onLogout }) {
   }
 
   const activeChips = [
-    search         && { key: "search",   label: `"${search}"`,                  clear: () => { setSearch("");         load({ ...buildParams(), search:   "" }); } },
-    filterSegment  && { key: "segment",  label: SEGMENT_LABEL[filterSegment],    clear: () => { setFilterSegment("");  load({ ...buildParams(), segment:  "" }); } },
-    filterInterest && { key: "interest", label: INTEREST_LABEL[filterInterest],  clear: () => { setFilterInterest(""); load({ ...buildParams(), interest: "" }); } },
-    filterCity     && { key: "city",     label: `Cidade: ${filterCity}`,         clear: () => { setFilterCity("");     load({ ...buildParams(), city:     "" }); } },
+    search         && { key: "search",   label: `"${search}"`,                  clear: () => { setSearch("");         setPage(1); load({ ...buildParams(), search:   "", page: 1 }); } },
+    filterSegment  && { key: "segment",  label: SEGMENT_LABEL[filterSegment],    clear: () => { setFilterSegment("");  setPage(1); load({ ...buildParams(), segment:  "", page: 1 }); } },
+    filterInterest && { key: "interest", label: INTEREST_LABEL[filterInterest],  clear: () => { setFilterInterest(""); setPage(1); load({ ...buildParams(), interest: "", page: 1 }); } },
+    filterCity     && { key: "city",     label: `Cidade: ${filterCity}`,         clear: () => { setFilterCity("");     setPage(1); load({ ...buildParams(), city:     "", page: 1 }); } },
   ].filter(Boolean);
 
   const hasActiveFilters = activeChips.length > 0;
   const advancedCount = [filterSegment, filterInterest, filterCity].filter(Boolean).length;
 
-  const totalPages = Math.ceil(leads.length / PER_PAGE);
-  const paginated  = leads.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalPages = Math.ceil(total / PER_PAGE);
+  const paginated  = leads;
 
   const interestChartData = [
     { name: "Demo",     value: stats.demo       || 0 },
@@ -554,7 +552,7 @@ function AdminDashboard({ token, username, onLogout }) {
                 <select
                   className="form-input w-full"
                   value={filterSegment}
-                  onChange={(e) => { setFilterSegment(e.target.value); setPage(1); load({ ...buildParams(), segment: e.target.value }); }}
+                  onChange={(e) => { setFilterSegment(e.target.value); setPage(1); load({ ...buildParams(), segment: e.target.value, page: 1 }); }}
                   aria-label="Filtrar por segmento"
                 >
                   <option value="">Todos</option>
@@ -571,7 +569,7 @@ function AdminDashboard({ token, username, onLogout }) {
                 <select
                   className="form-input w-full"
                   value={filterInterest}
-                  onChange={(e) => { setFilterInterest(e.target.value); setPage(1); load({ ...buildParams(), interest: e.target.value }); }}
+                  onChange={(e) => { setFilterInterest(e.target.value); setPage(1); load({ ...buildParams(), interest: e.target.value, page: 1 }); }}
                   aria-label="Filtrar por interesse"
                 >
                   <option value="">Todos</option>
@@ -591,7 +589,7 @@ function AdminDashboard({ token, username, onLogout }) {
                   aria-label="Filtrar por cidade"
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); setPage(1); load({ ...buildParams(), city: filterCity }); } }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); setPage(1); load({ ...buildParams(), city: filterCity, page: 1 }); } }}
                 />
               </div>
 
@@ -599,7 +597,7 @@ function AdminDashboard({ token, username, onLogout }) {
                 <button
                   type="button"
                   className="btn-ghost inline-flex w-full items-center justify-center gap-1.5 px-3 py-2 text-sm text-slate-400 sm:col-span-2 lg:col-span-1 lg:w-auto lg:self-end"
-                  onClick={() => { setFilterSegment(""); setFilterInterest(""); setFilterCity(""); setPage(1); load({ ...buildParams(), segment: "", interest: "", city: "" }); }}
+                  onClick={() => { setFilterSegment(""); setFilterInterest(""); setFilterCity(""); setPage(1); load({ ...buildParams(), segment: "", interest: "", city: "", page: 1 }); }}
                 >
                   <X size={13} aria-hidden="true" /> Limpar filtros
                 </button>
@@ -687,11 +685,11 @@ function AdminDashboard({ token, username, onLogout }) {
         {/* Paginação */}
         {!loading && totalPages > 1 && (
           <nav aria-label="Paginação" className="flex justify-center items-center gap-3 mt-6">
-            <button className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-1.5" disabled={page === 1} onClick={() => setPage((p) => p - 1)} aria-label="Página anterior">
+            <button className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-1.5" disabled={page === 1} onClick={() => { setPage((p) => p - 1); load({ ...buildParams(), page: page - 1 }); }} aria-label="Página anterior">
               <ChevronLeft size={14} aria-hidden="true" /> Anterior
             </button>
             <span className="text-sm text-slate-400">{page} / {totalPages}</span>
-            <button className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-1.5" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)} aria-label="Próxima página">
+            <button className="btn-ghost py-2 px-4 text-sm inline-flex items-center gap-1.5" disabled={page === totalPages} onClick={() => { setPage((p) => p + 1); load({ ...buildParams(), page: page + 1 }); }} aria-label="Próxima página">
               Próxima <ChevronRight size={14} aria-hidden="true" />
             </button>
           </nav>

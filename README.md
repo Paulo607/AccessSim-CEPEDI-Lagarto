@@ -8,7 +8,7 @@ Este repositório contém o site institucional (com formulário de captação de
 
 | Camada | Tecnologias |
 | :--- | :--- |
-| Backend | Django 6, Django REST Framework, SQLite (dev) |
+| Backend | Django 6, Django REST Framework, PostgreSQL |
 | Frontend | React 19, Vite, Tailwind CSS |
 | Auth do painel | Token (DRF `TokenAuthentication`, header `Authorization: Bearer <token>`) |
 
@@ -84,13 +84,24 @@ Rotas protegidas exigem o cabeçalho `Authorization: Bearer <token>` (token obti
 
 ## Como rodar — Backend
 
+**Pré-requisitos:** Python 3 instalado e PostgreSQL rodando localmente (com um banco vazio criado, ex: `accesssim_db`).
+
 ```bash
 cd backend/DjangoProject
+
+# 1. Crie o arquivo .env copiando do exemplo e ajuste a senha do seu banco
+cp .env.example .env
+
+# 2. Configure o ambiente virtual e instale as dependências
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python manage.py migrate        # inclui a tabela de tokens (rest_framework.authtoken)
+
+# 3. Rode as migrações (cria as tabelas no PostgreSQL)
+python manage.py migrate
 python manage.py createsuperuser
+
+# 4. Inicie o servidor
 python manage.py runserver
 ```
 
@@ -99,8 +110,14 @@ python manage.py runserver
 
 ## Como rodar — Frontend
 
+**Pré-requisitos:** Node.js instalado.
+
 ```bash
 cd frontend
+
+# Crie o arquivo .env copiando do exemplo (VITE_API_URL aponta para localhost)
+cp .env.example .env
+
 npm install
 npm run dev
 ```
@@ -108,17 +125,21 @@ npm run dev
 - Site: http://localhost:5173
 - Painel admin: http://localhost:5173/admin (login com o superusuário criado acima)
 
-> Backend e frontend precisam estar rodando ao mesmo tempo (dois terminais) — o Vite só consegue atender `/api/...` porque está fazendo proxy para o Django.
+> Backend e frontend precisam estar rodando ao mesmo tempo (em dois terminais).
 
-## Variáveis de ambiente (frontend)
+## Configuração de Deploy e Produção
 
-| Arquivo | Usado em | Valor |
-| :--- | :--- | :--- |
-| `.env` | `npm run dev` | `VITE_API_URL=` vazio — usa o proxy do Vite |
-| `.env.production` | `npm run build` | `VITE_API_URL=https://...` — URL pública do backend, sem proxy |
+A aplicação já está completamente preparada para rodar em produção utilizando as melhores práticas:
 
-## Notas para produção
+- **Variáveis de Ambiente:** Toda configuração sensível (Segurança, Bancos de Dados, Hosts e CORS) é injetada dinamicamente via arquivo `.env`. Veja o arquivo `.env.example` no diretório do backend para referência.
+- **Servidor de Produção:** O `gunicorn` já está configurado no `requirements.txt` como servidor HTTP oficial WSGI.
+- **Arquivos Estáticos:** A biblioteca `whitenoise` está ativa no `settings.py` (com `STATIC_ROOT = 'staticfiles'`) e intercepta a entrega de arquivos estáticos sem precisar de NGINX separado.
+- **Segurança HTTPS:** Flags essenciais como `SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` e `SECURE_HSTS_SECONDS` são facilmente ativadas inserindo seu valor `True` no `.env` do servidor online.
 
-- `CORS_ALLOW_ALL_ORIGINS = True` em `settings.py` é só para desenvolvimento. Em produção, troque por `CORS_ALLOWED_ORIGINS = ["https://seu-dominio.com"]`.
-- Defina `DEBUG = False` e mova `SECRET_KEY` para uma variável de ambiente antes de implantar.
-- `VITE_API_URL` em `.env.production` precisa apontar para o domínio real do backend já implantado (com `https://`, sem barra no final).
+Para gerar a versão final do Frontend para subida (Vercel, Netlify, S3, etc):
+```bash
+cd frontend
+# Garanta que o .env.production está com a VITE_API_URL correta do backend de produção
+npm run build
+```
+O comando gerará a pasta `dist/` otimizada e minificada para deploy estático.
