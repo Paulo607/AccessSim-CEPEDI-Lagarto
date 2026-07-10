@@ -143,3 +143,46 @@ cd frontend
 npm run build
 ```
 O comando gerará a pasta `dist/` otimizada e minificada para deploy estático.
+
+### Hospedagem 
+
+| Camada   | Serviço | URL                                                  |
+| -------- | ------- | ----------------------------------------------------- |
+| Frontend | Vercel  | https://access-sim-cepedi-lagarto.vercel.app          |
+| Backend  | Render  | https://accesssim-backend.onrender.com                |
+| Banco    | Render  | PostgreSQL (serviço gerenciado separado do backend)   |
+
+### Criação do superusuário (`create_admin.py`)
+
+O backend inclui um script (`create_admin.py`) responsável por criar ou atualizar o superusuário do painel administrativo automaticamente a cada deploy. Ele é executado como parte do **Build Command** do Render, logo após as migrações:
+
+```
+pip install -r requirements.txt && python manage.py migrate && python create_admin.py
+```
+
+O script lê as credenciais de variáveis de ambiente (nunca hardcoded no código) e:
+- Cria o superusuário se ele ainda não existir;
+- Atualiza a senha do usuário existente, caso as variáveis mudem;
+- Não faz nada se `ADMIN_PASSWORD` não estiver definida (evita criação acidental sem senha).
+
+**Variáveis de ambiente necessárias no serviço do Render** (configuradas em *Environment*, nunca commitadas no repositório):
+
+```
+# Banco de dados
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+
+# Segurança
+SECRET_KEY=
+DEBUG=False
+ALLOWED_HOSTS=
+CORS_ALLOW_ALL_ORIGINS=
+
+# Superusuário do painel admin
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+ADMIN_EMAIL=
+```
